@@ -26,7 +26,7 @@ The write path follows a simplified sequence: the engine modifies the page in it
 
 Aurora replicates data six ways across three Availability Zones — two copies per AZ — to tolerate what AWS calls "AZ+1" failures: the simultaneous loss of an entire Availability Zone plus one additional node [^3^]. The quorum uses six total votes (V=6), a write quorum of 4/6 (V=4), and a read quorum of 3/6 (V=3) [^10^].
 
-This design addresses correlated failures that traditional 2/3 quorums cannot survive. An AZ failure is a correlated failure of every node in that zone — a power event or network partition takes them all down simultaneously [^4^]. With Aurora's 6-copy layout, even if an entire AZ fails plus one additional node, four copies remain, preserving write quorum.
+This design addresses correlated failures that traditional 2/3 quorums cannot survive. An AZ failure is a correlated failure of every node in that zone — a power event or network partition takes them all down simultaneously. With Aurora's 6-copy layout, even if an entire AZ fails plus one additional node, four copies remain, preserving write quorum.
 
 The database volume is partitioned into 10 GB segments called Protection Groups (PGs), each independently replicated 6-way. A 10 GB segment repairs in approximately 10 seconds on a 10 Gbps link [^5^]. Multiple segment failures repair in parallel. Storage volumes auto-grow by adding PGs up to 128 TB [^6^].
 
@@ -34,40 +34,40 @@ The SIGMOD 2018 paper introduced a cost optimization: each Protection Group cont
 
 ```mermaid
 flowchart LR
-    subgraph AZ1["Availability Zone 1"]
-        S1["Segment 1A<br/>(Full)"]
-        S2["Segment 1B<br/>(Tail)"]
-    end
-    subgraph AZ2["Availability Zone 2"]
-        S3["Segment 2A<br/>(Full)"]
-        S4["Segment 2B<br/>(Tail)"]
-    end
-    subgraph AZ3["Availability Zone 3"]
-        S5["Segment 3A<br/>(Full)"]
-        S6["Segment 3B<br/>(Tail)"]
-    end
-    subgraph Compute["Compute Tier"]
-        W["Writer Instance<br/>(mysqld)"]
-        R1["Reader 1"]
-        R2["Reader 2"]
-    end
-    W -->|"Redo log records only"| S1
-    W -->|"Redo log records only"| S2
-    W -->|"Redo log records only"| S3
-    W -->|"Redo log records only"| S4
-    W -->|"Redo log records only"| S5
-    W -->|"Redo log records only"| S6
-    W -.->|"Redo log stream"| R1
-    W -.->|"Redo log stream"| R2
-    S1 <-->|"Gossip: fill gaps"| S3
-    S3 <-->|"Gossip: fill gaps"| S5
-    S1 <-->|"Gossip: fill gaps"| S5
-    classDef az fill:#e8e8e8,stroke:#333
-    classDef compute fill:#d4edda,stroke:#333
-    classDef storage fill:#fff3cd,stroke:#333
-    class AZ1,AZ2,AZ3 az
-    class W,R1,R2 compute
-    class S1,S2,S3,S4,S5,S6 storage
+ subgraph AZ1["Availability Zone 1"]
+ S1["Segment 1A<br/>(Full)"]
+ S2["Segment 1B<br/>(Tail)"]
+ end
+ subgraph AZ2["Availability Zone 2"]
+ S3["Segment 2A<br/>(Full)"]
+ S4["Segment 2B<br/>(Tail)"]
+ end
+ subgraph AZ3["Availability Zone 3"]
+ S5["Segment 3A<br/>(Full)"]
+ S6["Segment 3B<br/>(Tail)"]
+ end
+ subgraph Compute["Compute Tier"]
+ W["Writer Instance<br/>(mysqld)"]
+ R1["Reader 1"]
+ R2["Reader 2"]
+ end
+ W -->|"Redo log records only"| S1
+ W -->|"Redo log records only"| S2
+ W -->|"Redo log records only"| S3
+ W -->|"Redo log records only"| S4
+ W -->|"Redo log records only"| S5
+ W -->|"Redo log records only"| S6
+ W -.->|"Redo log stream"| R1
+ W -.->|"Redo log stream"| R2
+ S1 <-->|"Gossip: fill gaps"| S3
+ S3 <-->|"Gossip: fill gaps"| S5
+ S1 <-->|"Gossip: fill gaps"| S5
+ classDef az fill:#e8e8e8,stroke:#333
+ classDef compute fill:#d4edda,stroke:#333
+ classDef storage fill:#fff3cd,stroke:#333
+ class AZ1,AZ2,AZ3 az
+ class W,R1,R2 compute
+ class S1,S2,S3,S4,S5,S6 storage
 ```
 
 **Diagram:** Aurora's storage-compute separation. The writer sends only redo log records to six storage segments across three AZs. Readers receive the redo log stream independently but share the same underlying storage volume. Storage nodes gossip among themselves to fill gaps in the log chain.
@@ -89,15 +89,15 @@ Each storage node processes incoming log records through an eight-step pipeline.
 | 7 | Garbage Collect | Background | Remove old page versions based on PGMRPL low-water mark |
 | 8 | Validate CRC | Background | Verify data integrity of stored pages |
 
-The foreground-background separation is a core design tenet: storage service minimizes write latency by moving the majority of processing to the background. Critically, background processing has *negative* correlation with foreground — when foreground load is high, background work backs off. This is the opposite of traditional databases, where checkpointing has *positive* correlation with foreground load, creating I/O spikes and jitter [^14^].
+The foreground-background separation is a core design tenet: storage service minimizes write latency by moving the majority of processing to the background. Critically, background processing has *negative* correlation with foreground — when foreground load is high, background work backs off. This is the opposite of traditional databases, where checkpointing has *positive* correlation with foreground load, creating I/O spikes and jitter.
 
-Storage nodes use peer-to-peer gossip to fill gaps. Each log record contains a backlink to the previous record for its Protection Group, enabling nodes to track their Segment Complete LSN (SCL) — the greatest LSN below which all log records for that PG have been received [^18^]. If Segment 1 is missing LSN 4, it gossips with Segment 2 to retrieve it and advances its SCL [^19^].
+Storage nodes use peer-to-peer gossip to fill gaps. Each log record contains a backlink to the previous record for its Protection Group, enabling nodes to track their Segment Complete LSN (SCL) — the greatest LSN below which all log records for that PG have been received [^18^]. If Segment 1 is missing LSN 4, it gossips with Segment 2 to retrieve it and advances its SCL.
 
 ### 1.2.2 Consistency Points: VCL, VDL, SCL, and CPL
 
-Aurora avoids distributed consensus protocols by using monotonically increasing Log Sequence Numbers and a hierarchy of consistency points [^12^]. Understanding these acronyms is essential for diagnosing replication anomalies.
+Aurora avoids distributed consensus protocols by using monotonically increasing Log Sequence Numbers and a hierarchy of consistency points. Understanding these acronyms is essential for diagnosing replication anomalies.
 
-**LSN** (Log Sequence Number) is a monotonically increasing value assigned to each log record. **CPL** (Consistency Point LSN) marks the final log record of a mini-transaction — operations that must execute atomically, such as a B+ tree page split [^7^]. **SCL** (Segment Complete LSN) tracks the greatest LSN below which all log records of a given PG have been received by a storage segment. **VCL** (Volume Complete LSN) is the highest LSN for which all prior log records have met write quorum across all Protection Groups. **VDL** (Volume Durable LSN) is the highest CPL ≤ VCL — the actual durability point for commits [^13^].
+**LSN** (Log Sequence Number) is a monotonically increasing value assigned to each log record. **CPL** (Consistency Point LSN) marks the final log record of a mini-transaction — operations that must execute atomically, such as a B+ tree page split [^7^]. **SCL** (Segment Complete LSN) tracks the greatest LSN below which all log records of a given PG have been received by a storage segment. **VCL** (Volume Complete LSN) is the highest LSN for which all prior log records have met write quorum across all Protection Groups. **VDL** (Volume Durable LSN) is the highest CPL ≤ VCL — the actual durability point for commits.
 
 The VCL/VDL distinction matters operationally. If storage has received records up to LSN 1007 but only LSNs 900, 1000, and 1100 are CPLs, the system is "complete" to 1007 but only "durable" to 1000. Recovery truncates records above VDL [^40^].
 
@@ -108,10 +108,10 @@ Transaction commits use VDL as their durability gate. A worker thread records th
 -- (Available via SHOW ENGINE INNODB STATUS; look for Log sequence number)
 SHOW ENGINE INNODB STATUS\G
 -- Key lines to monitor:
--- Log sequence number          - Current LSN being generated
--- Log flushed up to            - LSN durably written to storage
--- Pages flushed up to          - Page materialization progress (less relevant in Aurora)
--- Last checkpoint at           - Aurora manages this at storage layer
+-- Log sequence number - Current LSN being generated
+-- Log flushed up to - LSN durably written to storage
+-- Pages flushed up to - Page materialization progress (less relevant in Aurora)
+-- Last checkpoint at - Aurora manages this at storage layer
 
 -- Monitor the History List Length (cluster-wide undo growth)
 SELECT NAME AS RollbackSegmentHistoryListLength, COUNT
@@ -139,9 +139,9 @@ This has a critical implication: many production problems in Aurora are standard
 
 ### 1.3.3 Aurora-Specific Additions: Survivable Cache, csdd, and Health Monitor
 
-Aurora introduces three components with no standard MySQL equivalent. The **survivable page cache** manages each instance's buffer pool in a separate process, allowing it to survive database restarts without repopulation [^23^][^57^]. Aurora MySQL 2.10+ also keeps in-region readers from rebooting on writer restart [^35^]. However — critical for failover planning — the survivable cache is instance-local. A reader promoted to writer starts with *its* buffer pool, not the original writer's. Cluster Cache Management, which pre-warms failover targets, is Aurora PostgreSQL only [^334^].
+Aurora introduces three components with no standard MySQL equivalent. The **survivable page cache** manages each instance's buffer pool in a separate process, allowing it to survive database restarts without repopulation [^23^]. Aurora MySQL 2.10+ also keeps in-region readers from rebooting on writer restart [^35^]. However — critical for failover planning — the survivable cache is instance-local. A reader promoted to writer starts with *its* buffer pool, not the original writer's. Cluster Cache Management, which pre-warms failover targets, is Aurora PostgreSQL only [^334^].
 
-The **cluster storage daemon (csdd)** manages communication between compute and storage. The **health monitor (HM)** tracks instance health for the Aurora control plane. Together with `mysqld`, these three processes consume memory on every Aurora instance [^101^]. RDS MySQL has only `mysqld` and HM. Aurora's extra process overhead and absence of swap space make OOM kills more likely than in RDS MySQL [^101^].
+The **cluster storage daemon (csdd)** manages communication between compute and storage. The **health monitor (HM)** tracks instance health for the Aurora control plane. Together with `mysqld`, these three processes consume memory on every Aurora instance. RDS MySQL has only `mysqld` and HM. Aurora's extra process overhead and absence of swap space make OOM kills more likely than in RDS MySQL.
 
 ```sql
 -- Check memory usage by background threads:
@@ -160,14 +160,14 @@ ORDER BY mb_used DESC;
 |-----------|---------------|--------------|-------------------|
 | Network writes | Full data pages + redo log + doublewrite + binlog | Redo log records only | 7.7x fewer I/Os per transaction [^8^] |
 | Durability | Local `fsync` or semi-sync replication | 4/6 quorum across 3 AZs | Survives AZ+1 failure without data loss |
-| Checkpointing | Engine-driven, periodic I/O spikes | Continuous, storage-driven | No checkpoint-related jitter or stalls [^14^] |
+| Checkpointing | Engine-driven, periodic I/O spikes | Continuous, storage-driven | No checkpoint-related jitter or stalls |
 | Doublewrite buffer | Required; ~2x page write amplification | Eliminated | Reduced contention, simpler tuning [^16^] |
 | Crash recovery | Replay from last checkpoint (minutes) | Near-instant; parallel at storage tier | 97% faster recovery; no startup replay [^27^] |
 | Buffer pool on restart | Lost; cold start | Survives process restart [^23^] | Faster recovery; but failover target may still be cold |
 | Read replicas | Binlog shipping; independent storage | Shared storage; redo log cache invalidation | <20ms typical lag; up to 15 replicas [^29^] |
 | Storage scaling | Manual, with downtime | Automatic up to 128 TB | Zero-downtime growth |
 | Write amplification | ~7.4 I/Os per transaction | ~0.95 I/Os per transaction | 35x more throughput in benchmarks [^8^] |
-| Background I/O correlation | Positive (spikes under load) | Negative (backs off under load) | More predictable latency under stress [^14^] |
+| Background I/O correlation | Positive (spikes under load) | Negative (backs off under load) | More predictable latency under stress |
 
 This table captures the architectural differences that directly affect operational decisions. The write amplification reduction is not a marginal improvement — it is structural, enabling workloads that would saturate network bandwidth on standard MySQL to run comfortably on Aurora. The elimination of checkpointing and doublewrite buffer removes two of the most common sources of production performance variance in InnoDB deployments. However, the shared storage model introduces new failure modes that standard MySQL does not exhibit — these are covered in Chapters 3 through 6.
 
@@ -189,23 +189,23 @@ The Adaptive Hash Index is silently disabled on Aurora reader nodes — AWS engi
 
 ### 1.4.3 AuroraReplicaLag: Cache Update Delay, Not Transaction Delay
 
-The `AuroraReplicaLag` CloudWatch metric measures the delay for a reader's buffer pool to be updated — it does NOT measure storage-level replication lag [^351^]. Storage is strongly consistent; there is essentially zero storage lag. The metric reflects only the time between when a change is committed to storage and when the reader has applied the corresponding redo log to its cached pages. In practice, replica lag is typically under 20ms and often under 10ms [^29^].
+The `AuroraReplicaLag` CloudWatch metric measures the delay for a reader's buffer pool to be updated — it does NOT measure storage-level replication lag. Storage is strongly consistent; there is essentially zero storage lag. The metric reflects only the time between when a change is committed to storage and when the reader has applied the corresponding redo log to its cached pages. In practice, replica lag is typically under 20ms and often under 10ms [^29^].
 
 This distinction causes production confusion. An application that writes to the cluster endpoint and immediately reads from a reader may see stale data even when `AuroraReplicaLag` is near-zero, because the metric does not capture whether the specific page has had its redo log applied [^168^]. For read-after-write consistency, query the writer.
 
-Lag spikes have several root causes: under-provisioned readers lacking CPU for redo application; heavy analytical queries consuming reader resources; bulk writes overwhelming redo consumption; and most critically, a long-running transaction completing and triggering a massive purge that generates additional redo, causing readers to fall behind and restart in a cascade [^317^].
+Lag spikes have several root causes: under-provisioned readers lacking CPU for redo application; heavy analytical queries consuming reader resources; bulk writes overwhelming redo consumption; and most critically, a long-running transaction completing and triggering a massive purge that generates additional redo, causing readers to fall behind and restart in a cascade.
 
 ```sql
 -- Identify reader instances holding old read views (blocks cluster-wide purge)
 SELECT SERVER_ID,
-       IF(SESSION_ID = 'master_session_id', 'writer', 'reader') AS ROLE,
-       REPLICA_LAG_IN_MSEC, OLDEST_READ_VIEW_TRX_ID, OLDEST_READ_VIEW_LSN
+ IF(SESSION_ID = 'master_session_id', 'writer', 'reader') AS ROLE,
+ REPLICA_LAG_IN_MSEC, OLDEST_READ_VIEW_TRX_ID, OLDEST_READ_VIEW_LSN
 FROM MYSQL.RO_REPLICA_STATUS ORDER BY OLDEST_READ_VIEW_TRX_ID;
 
 -- Find long-running transactions on any instance
 SELECT a.TRX_ID, a.TRX_STARTED,
-       TIMESTAMPDIFF(SECOND, a.TRX_STARTED, NOW()) AS SECONDS_OPEN,
-       b.USER, b.HOST, b.STATE
+ TIMESTAMPDIFF(SECOND, a.TRX_STARTED, NOW()) AS SECONDS_OPEN,
+ b.USER, b.HOST, b.STATE
 FROM INFORMATION_SCHEMA.INNODB_TRX a
 JOIN INFORMATION_SCHEMA.PROCESSLIST b ON a.TRX_MYSQL_THREAD_ID = b.ID
 WHERE TIMESTAMPDIFF(SECOND, a.TRX_STARTED, NOW()) > 60 ORDER BY a.TRX_STARTED;
@@ -214,11 +214,11 @@ WHERE TIMESTAMPDIFF(SECOND, a.TRX_STARTED, NOW()) > 60 ORDER BY a.TRX_STARTED;
 ```bash
 # Check replica lag across all readers via CloudWatch
 aws cloudwatch get-metric-statistics \
-  --namespace AWS/RDS --metric-name AuroraReplicaLag \
-  --dimensions Name=DBClusterIdentifier,Value=my-cluster Name=Role,Value=READER \
-  --start-time $(date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%S) \
-  --end-time $(date -u +%Y-%m-%dT%H:%M:%S) --period 60 \
-  --statistics Average Maximum
+ --namespace AWS/RDS --metric-name AuroraReplicaLag \
+ --dimensions Name=DBClusterIdentifier,Value=my-cluster Name=Role,Value=READER \
+ --start-time $(date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%S) \
+ --end-time $(date -u +%Y-%m-%dT%H:%M:%S) --period 60 \
+ --statistics Average Maximum
 # Alert thresholds: >100ms warning, >1,000ms critical, >5,000ms reader restarting
 ```
 

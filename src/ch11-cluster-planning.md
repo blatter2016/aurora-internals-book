@@ -12,37 +12,37 @@ Aurora MySQL offers four memory-optimized instance families for production workl
 
 | Instance Family | Processor | Gen | vCPU:RAM (large) | On-Demand/hr (us-east-1) | Best For |
 |:---|:---|:---|:---|:---|:---|
-| db.r6g | Graviton2 | Previous | 2:16 GiB | $0.260 [^578^] | Stable workloads, proven track record |
-| db.r7g | Graviton3 | Current | 2:16 GiB | ~$0.239 [^583^] | New deployments, best Graviton price-performance |
-| db.r6i | Intel Ice Lake | Current | 2:16 GiB | ~$0.290 [^513^] | Workloads requiring x86, specific Intel optimizations |
-| db.x2g | Graviton2 | Memory-opt | 2:32 GiB | $0.377 [^592^] | Large working sets, cache-heavy analytics |
+| db.r6g | Graviton2 | Previous | 2:16 GiB | $0.260 | Stable workloads, proven track record |
+| db.r7g | Graviton3 | Current | 2:16 GiB | ~$0.239 | New deployments, best Graviton price-performance |
+| db.r6i | Intel Ice Lake | Current | 2:16 GiB | ~$0.290 | Workloads requiring x86, specific Intel optimizations |
+| db.x2g | Graviton2 | Memory-opt | 2:32 GiB | $0.377 | Large working sets, cache-heavy analytics |
 
-The db.r7g family is the default recommendation for new clusters. AWS confirms that Graviton3 delivers up to 30% better performance and up to 27% better price-performance compared to Graviton2 for open-source databases on RDS [^583^], and Graviton2 itself provides 35% better price-performance on Aurora compared to equivalent Intel generations [^588^]. The db.x2g family justifies its premium only when the active dataset exceeds ~75% of available R-family RAM at the desired vCPU count — a condition detectable via `BufferCacheHitRatio` consistently below 95% even on an R-family instance.
+The db.r7g family is the default recommendation for new clusters. AWS confirms that Graviton3 delivers up to 30% better performance and up to 27% better price-performance compared to Graviton2 for open-source databases on RDS, and Graviton2 itself provides 35% better price-performance on Aurora compared to equivalent Intel generations. The db.x2g family justifies its premium only when the active dataset exceeds ~75% of available R-family RAM at the desired vCPU count — a condition detectable via `BufferCacheHitRatio` consistently below 95% even on an R-family instance.
 
 Use this query to assess working set fit before choosing an instance family:
 
 ```sql
 -- Measure buffer pool efficiency and working set pressure
 SELECT
-    ROUND(
-        (1 - (
-            (SELECT VARIABLE_VALUE FROM performance_schema.global_status
-             WHERE VARIABLE_NAME = 'Innodb_buffer_pool_reads') /
-            (SELECT VARIABLE_VALUE FROM performance_schema.global_status
-             WHERE VARIABLE_NAME = 'Innodb_buffer_pool_read_requests')
-        )) * 100, 2
-    ) AS buffer_pool_hit_pct,
-    ROUND(
-        (SELECT VARIABLE_VALUE FROM performance_schema.global_status
-         WHERE VARIABLE_NAME = 'Innodb_buffer_pool_pages_data') * 16 / 1024 / 1024, 2
-    ) AS data_pages_in_gb;
+ ROUND(
+ (1 - (
+ (SELECT VARIABLE_VALUE FROM performance_schema.global_status
+ WHERE VARIABLE_NAME = 'Innodb_buffer_pool_reads') /
+ (SELECT VARIABLE_VALUE FROM performance_schema.global_status
+ WHERE VARIABLE_NAME = 'Innodb_buffer_pool_read_requests')
+)) * 100, 2
+) AS buffer_pool_hit_pct,
+ ROUND(
+ (SELECT VARIABLE_VALUE FROM performance_schema.global_status
+ WHERE VARIABLE_NAME = 'Innodb_buffer_pool_pages_data') * 16 / 1024 / 1024, 2
+) AS data_pages_in_gb;
 ```
 
-If `buffer_pool_hit_pct` is below 95% and `data_pages_in_gb` is near the instance's buffer pool limit (75% of RAM), move to the next larger R-family size or consider X2g. Do not guess — the CloudWatch `BufferCacheHitRatio` metric exposes this precisely [^596^].
+If `buffer_pool_hit_pct` is below 95% and `data_pages_in_gb` is near the instance's buffer pool limit (75% of RAM), move to the next larger R-family size or consider X2g. Do not guess — the CloudWatch `BufferCacheHitRatio` metric exposes this precisely.
 
 ### Graviton Migration: Compelling but Context-Dependent
 
-Migrating from Intel to Graviton is the highest-ROI, lowest-risk optimization available. The process is a simple instance type change during a maintenance window — no data migration required [^536^]. However, the headline savings figures overstate the benefit for Aurora relative to RDS MySQL because Aurora runs three memory-consuming processes (`mysqld`, `csdd`, and HM) versus only two in RDS MySQL (`mysqld` and HM) [^101^]. The `csdd` (cluster storage daemon) and HM (health monitor) processes consume CPU and memory regardless of processor architecture, diluting the per-workload efficiency gains from Graviton's better instruction-per-clock performance. Expect savings at the lower end of the 20–35% range on smaller instances where fixed overhead represents a larger fraction of total resource consumption; the advantage increases with instance size.
+Migrating from Intel to Graviton is the highest-ROI, lowest-risk optimization available. The process is a simple instance type change during a maintenance window — no data migration required. However, the headline savings figures overstate the benefit for Aurora relative to RDS MySQL because Aurora runs three memory-consuming processes (`mysqld`, `csdd`, and HM) versus only two in RDS MySQL (`mysqld` and HM). The `csdd` (cluster storage daemon) and HM (health monitor) processes consume CPU and memory regardless of processor architecture, diluting the per-workload efficiency gains from Graviton's better instruction-per-clock performance. Expect savings at the lower end of the 20–35% range on smaller instances where fixed overhead represents a larger fraction of total resource consumption; the advantage increases with instance size.
 
 Before migrating, verify that all application dependencies are compiled for ARM64. While pure Java, Python, and Go applications typically require no changes, any native C/C++ extension or client library with architecture-specific binaries must be tested.
 
@@ -50,20 +50,20 @@ Before migrating, verify that all application dependencies are compiled for ARM6
 
 This is the most consequential and most frequently violated sizing rule in Aurora. A reader instance smaller than the writer creates a purge liability that can increase total cluster cost rather than reducing it.
 
-The mechanism, established in Chapter 5, works as follows. Because all Aurora instances share a single undo log, a read view opened on any reader blocks the writer's purge process for the entire cluster [^331^]. An under-provisioned reader — smaller buffer pool, fewer CPUs — is more likely to fall behind applying redo log records during write-heavy periods. When that reader finally releases an old read view, the writer initiates aggressive purge, generating a surge of I/O operations. The reader, already under-powered, may fail to keep up with the purge storm and be restarted by Aurora [^317^]. Each storage read I/O costs $0.20 per million requests, and a sustained purge storm can generate hundreds of millions of additional I/Os per month — easily exceeding the compute "savings" from running a smaller reader [^554^].
+The mechanism, established in Chapter 5, works as follows. Because all Aurora instances share a single undo log, a read view opened on any reader blocks the writer's purge process for the entire cluster [^331^]. An under-provisioned reader — smaller buffer pool, fewer CPUs — is more likely to fall behind applying redo log records during write-heavy periods. When that reader finally releases an old read view, the writer initiates aggressive purge, generating a surge of I/O operations. The reader, already under-powered, may fail to keep up with the purge storm and be restarted by Aurora. Each storage read I/O costs $0.20 per million requests, and a sustained purge storm can generate hundreds of millions of additional I/Os per month — easily exceeding the compute "savings" from running a smaller reader.
 
 Operational guideline: reader instances should be the same class as the writer minimum, and one size larger if they serve heavy read traffic. A `db.r6g.xlarge` writer with a `db.r6g.large` reader saves approximately $190 per month in compute but risks thousands in I/O overages and operational incidents. The correct framing treats reader sizing as financial risk management, not just performance tuning.
 
-For workload isolation, use custom endpoints to direct analytical queries to dedicated reader instances, preventing long-running SELECT statements from impacting OLTP readers [^336^]:
+For workload isolation, use custom endpoints to direct analytical queries to dedicated reader instances, preventing long-running SELECT statements from impacting OLTP readers:
 
 ```bash
 # Create a custom endpoint for reporting workloads
 aws rds create-db-cluster-endpoint \
-    --db-cluster-identifier my-cluster \
-    --db-cluster-endpoint-identifier reporting-endpoint \
-    --endpoint-type custom \
-    --static-members '["reader-instance-1","reader-instance-2"]' \
-    --region us-east-1
+ --db-cluster-identifier my-cluster \
+ --db-cluster-endpoint-identifier reporting-endpoint \
+ --endpoint-type custom \
+ --static-members '["reader-instance-1","reader-instance-2"]' \
+ --region us-east-1
 ```
 
 ## 11.2 Storage and I/O Planning
@@ -77,7 +77,7 @@ This pricing model eliminates the storage provisioning guesswork required for st
 ```sql
 -- Accurate per-table sizing using information_schema.files
 SELECT file_name,
-       ROUND(SUM(total_extents * extent_size) / 1024 / 1024 / 1024, 2) AS size_gb
+ ROUND(SUM(total_extents * extent_size) / 1024 / 1024 / 1024, 2) AS size_gb
 FROM information_schema.files
 WHERE file_name LIKE '%.ibd'
 GROUP BY file_name
@@ -87,7 +87,7 @@ LIMIT 20;
 
 ### I/O Operations: The Most Common Billing Surprise
 
-I/O is the line item that destroys Aurora cost models. Every read of a 16 KB page from storage and every 4 KB write unit counts as one I/O request at $0.20 per million [^554^]. This includes background I/O from buffer pool evictions, redo log writes, and checksum operations — not just user-query-generated I/O.
+I/O is the line item that destroys Aurora cost models. Every read of a 16 KB page from storage and every 4 KB write unit counts as one I/O request at $0.20 per million. This includes background I/O from buffer pool evictions, redo log writes, and checksum operations — not just user-query-generated I/O.
 
 A single SQL UPDATE touching 50 pages generates 50 write I/O charges. At 1,000 transactions per second, each touching 50 pages, the cluster generates approximately 4.3 billion I/Os per day — over $860 per day in I/O charges, or more than $25,000 per month in I/O costs alone. This dwarfs compute costs for a `db.r6g.xlarge` instance at roughly $423 per month.
 
@@ -106,23 +106,23 @@ Aurora I/O-Optimized, launched in mid-2023, eliminates per-I/O charges in exchan
 | Configuration | Storage Rate | Instance Premium | I/O Rate | Best When |
 |:---|:---|:---|:---|:---|
 | Standard | $0.10/GB-month | Base | $0.20/million | I/O < 25% of total bill |
-| I/O-Optimized | $0.225/GB-month | +30% | $0 (included) | I/O > 25% of total bill [^554^] |
+| I/O-Optimized | $0.225/GB-month | +30% | $0 (included) | I/O > 25% of total bill |
 
 Switching is a cluster-level configuration change with no downtime, but it is reversible only after 30 days. Do not use I/O-Optimized to mask operational problems. If I/O spikes correlate with History List Length growth, fix the purge root cause first — otherwise you pay 30% more for compute and 125% more for storage indefinitely instead of resolving the issue at its source, which may require only terminating a long-running query.
 
 A worked example for a mid-size OLTP workload running on `db.r6g.xlarge` with 500 GB storage:
 
 ```
-Standard (500M I/Os/month):   $423 compute + $50 storage + $100 I/O  = $573/month
-I/O-Optimized (500M I/Os):    $550 compute + $113 storage + $0 I/O   = $663/month
-I/O-Optimized break-even:     ~750M I/Os/month (where I/O = $150 on Standard)
+Standard (500M I/Os/month): $423 compute + $50 storage + $100 I/O = $573/month
+I/O-Optimized (500M I/Os): $550 compute + $113 storage + $0 I/O = $663/month
+I/O-Optimized break-even: ~750M I/Os/month (where I/O = $150 on Standard)
 ```
 
 ## 11.3 Scaling Patterns
 
 ### Scale-Up vs. Scale-Out Decision Tree
 
-Aurora MySQL is fundamentally a single-master cluster [^539^]. Write throughput scales only vertically (larger instances). Read throughput scales horizontally (more replicas). This asymmetry is the defining constraint of all Aurora scaling decisions.
+Aurora MySQL is fundamentally a single-master cluster. Write throughput scales only vertically (larger instances). Read throughput scales horizontally (more replicas). This asymmetry is the defining constraint of all Aurora scaling decisions.
 
 | Bottleneck Indicator | Scale Up (Larger Instance) | Scale Out (Add Replicas) | Notes |
 |:---|:---|:---|:---|
@@ -138,7 +138,7 @@ The critical operational rule: never add read replicas to solve a memory or writ
 
 ### Aurora Serverless v2: Not Always Cheaper
 
-Aurora Serverless v2 scales compute capacity in 0.5 ACU increments, where each ACU provides approximately 2 GiB of memory with corresponding CPU and networking. Minimum capacity is 0.5 ACU; maximum is 256 ACU (512 GiB). Scaling from zero capacity (with auto-pause) resumed in approximately 15 seconds as of December 2024, acceptable for development but not for production with latency SLOs [^534^].
+Aurora Serverless v2 scales compute capacity in 0.5 ACU increments, where each ACU provides approximately 2 GiB of memory with corresponding CPU and networking. Minimum capacity is 0.5 ACU; maximum is 256 ACU (512 GiB). Scaling from zero capacity (with auto-pause) resumed in approximately 15 seconds as of December 2024, acceptable for development but not for production with latency SLOs.
 
 Pricing is $0.12 per ACU-hour for Aurora Standard in us-east-1. The cost comparison against provisioned instances is workload-dependent:
 
@@ -149,7 +149,7 @@ Pricing is $0.12 per ACU-hour for Aurora Standard in us-east-1. The cost compari
 | Mid-size OLTP (variable) | 2–16 | 8 | ~$701 | db.r6g.xlarge (~$423) |
 | High-traffic API (sustained) | 8–32 | 24 | ~$2,102 | db.r6g.4xlarge (~$847) |
 
-Serverless v2 is cheaper when the peak-to-average compute ratio exceeds 3x — dev/test environments with idle periods, unpredictable spiky workloads, or applications where capacity planning is genuinely difficult. It is more expensive for steady 24/7 production workloads, especially when Reserved Instances can be applied [^513^].
+Serverless v2 is cheaper when the peak-to-average compute ratio exceeds 3x — dev/test environments with idle periods, unpredictable spiky workloads, or applications where capacity planning is genuinely difficult. It is more expensive for steady 24/7 production workloads, especially when Reserved Instances can be applied.
 
 A hybrid pattern is common in production: a provisioned writer with Reserved Instances for the predictable baseline, plus Serverless v2 readers that auto-scale for variable read traffic. This captures RI discounts on the steady component while avoiding over-provisioning for variable read load.
 
@@ -161,7 +161,7 @@ Aurora Global Database enables a single Aurora cluster to span multiple AWS regi
 
 Cost components beyond standard Aurora pricing include: replicated write I/Os between primary and secondary regions at $0.20 per million; secondary region instances billed at normal regional rates; secondary region storage billed normally; and cross-region data transfer at standard AWS rates. Notably, even under I/O-Optimized configuration, replicated write I/O charges between regions still apply — the zero I/O charges apply only to local reads and writes.
 
-Budget approximately 1.5–2x the cost of the primary cluster for each secondary region. A primary cluster in us-east-1 with two `db.r6i.large` instances plus a secondary in us-west-2 with one reader, 80 GB storage, and 45 million write I/Os per month totals approximately $674 per month [^578^]. Global Database is not recommended for write-heavy workloads where replication costs accumulate without proportional read benefit in the secondary region.
+Budget approximately 1.5–2x the cost of the primary cluster for each secondary region. A primary cluster in us-east-1 with two `db.r6i.large` instances plus a secondary in us-west-2 with one reader, 80 GB storage, and 45 million write I/Os per month totals approximately $674 per month. Global Database is not recommended for write-heavy workloads where replication costs accumulate without proportional read benefit in the secondary region.
 
 ## 11.4 Cost Optimization Strategies
 
@@ -174,15 +174,15 @@ Three pricing models apply to Aurora compute. The optimal choice depends on comm
 | On-Demand | None | Hourly | Full | Unpredictable, short-term, or evaluation workloads |
 | Reserved Instances (1-year, No Upfront) | 40–45% | 1 year, specific family/region/engine | Size-flexible within family; no cross-family | Stable production on known instance family |
 | Reserved Instances (3-year, All Upfront) | 63–66% | 3 years, specific family/region/engine | Size-flexible within family | Long-term stable production with capital available |
-| Database Savings Plans (1-year) | Up to 35% | 1 year only, No Upfront only | Cross-region, cross-engine, cross-instance, cross-service [^533^] | Mixed database services, possible architecture changes |
+| Database Savings Plans (1-year) | Up to 35% | 1 year only, No Upfront only | Cross-region, cross-engine, cross-instance, cross-service | Mixed database services, possible architecture changes |
 
-Database Savings Plans, launched December 2025, cover Aurora, RDS, DynamoDB, ElastiCache (Valkey), DocumentDB, and Neptune [^533^]. They apply only to Gen 7+ instances (r7g, r7i). If running Gen 6 or older, upgrade first, then purchase commitments. The cross-service flexibility is valuable for organizations running multiple database engines, but the 1-year-only term and lower discount ceiling make 3-year RIs preferable for stable, single-engine workloads.
+Database Savings Plans, launched December 2025, cover Aurora, RDS, DynamoDB, ElastiCache (Valkey), DocumentDB, and Neptune. They apply only to Gen 7+ instances (r7g, r7i). If running Gen 6 or older, upgrade first, then purchase commitments. The cross-service flexibility is valuable for organizations running multiple database engines, but the 1-year-only term and lower discount ceiling make 3-year RIs preferable for stable, single-engine workloads.
 
 The break-even for a 1-year No Upfront RI occurs at approximately 55–60% utilization — if the instance runs fewer than ~4,400 hours in a year (out of 8,760), On-Demand is cheaper. For 3-year All Upfront RIs, the break-even is lower (~35% utilization over three years), but the capital is locked with AWS.
 
 ### Reader Auto-Scaling for Variable Workloads
 
-Aurora Auto Scaling adds or removes read replicas based on average CPU utilization across all reader instances. The writer CPU is not included in the calculation, and at least one reader must exist for auto-scaling to function [^12^].
+Aurora Auto Scaling adds or removes read replicas based on average CPU utilization across all reader instances. The writer CPU is not included in the calculation, and at least one reader must exist for auto-scaling to function.
 
 Configure with these parameters:
 
@@ -196,20 +196,20 @@ Configure with these parameters:
 
 Reader auto-scaling adds compute cost only when needed, but each new replica starts with a cold buffer pool. The first queries after scale-out trigger storage I/O, contributing to the I/O bill. For workloads with frequent but short spikes, consider keeping one "warm standby" replica at minimum capacity rather than scaling to zero readers.
 
-For dev/test environments, the most effective cost reduction is stopping instances during off-hours. Aurora clusters can be stopped for up to 7 days; no compute charges accrue during the stop period, though storage and backup charges continue. An instance running 8 hours per day, 5 days per week instead of 24/7 saves approximately 76% of compute costs [^578^]. Automate this with AWS Instance Scheduler or a Lambda function triggered by EventBridge.
+For dev/test environments, the most effective cost reduction is stopping instances during off-hours. Aurora clusters can be stopped for up to 7 days; no compute charges accrue during the stop period, though storage and backup charges continue. An instance running 8 hours per day, 5 days per week instead of 24/7 saves approximately 76% of compute costs. Automate this with AWS Instance Scheduler or a Lambda function triggered by EventBridge.
 
 ### max_connections Reality Check
 
-Aurora MySQL uses a unique formula for calculating `max_connections` that produces theoretical maximums far above practically sustainable limits [^101^]:
+Aurora MySQL uses a unique formula for calculating `max_connections` that produces theoretical maximums far above practically sustainable limits:
 
 ```
 max_connections = GREATEST(
-    {log2(DBInstanceClassMemory/805306368) * 45},
-    {log2(DBInstanceClassMemory/8187281408) * 1000}
+ {log2(DBInstanceClassMemory/805306368) * 45},
+ {log2(DBInstanceClassMemory/8187281408) * 1000}
 )
 ```
 
-For a `db.r6g.large` with 16 GiB RAM, this formula yields approximately 1,000 connections. The practical sustainable limit is 180–200. Each MySQL connection consumes approximately 8 MB of memory, and thread contention degrades throughput well before the connection ceiling is reached [^569^]. Aurora's three-process architecture (`mysqld`, `csdd`, HM) and absence of swap further reduce available memory per connection, increasing OOM risk as connection count grows [^101^].
+For a `db.r6g.large` with 16 GiB RAM, this formula yields approximately 1,000 connections. The practical sustainable limit is 180–200. Each MySQL connection consumes approximately 8 MB of memory, and thread contention degrades throughput well before the connection ceiling is reached. Aurora's three-process architecture (`mysqld`, `csdd`, HM) and absence of swap further reduce available memory per connection, increasing OOM risk as connection count grows.
 
 | Instance Type | RAM | Formula Output (max_connections) | Practical Sustainable Limit |
 |:---|:---|:---|:---|
@@ -227,13 +227,13 @@ SHOW GLOBAL STATUS LIKE 'Max_used_connections';
 
 -- Calculate connection memory overhead (approximate)
 SELECT
-    @@max_connections AS formula_max,
-    (SELECT VARIABLE_VALUE FROM performance_schema.global_status
-     WHERE VARIABLE_NAME = 'Threads_connected') AS current_connections,
-    ROUND(
-        (SELECT VARIABLE_VALUE FROM performance_schema.global_status
-         WHERE VARIABLE_NAME = 'Threads_connected') * 8 / 1024, 2
-    ) AS estimated_conn_memory_gb;
+ @@max_connections AS formula_max,
+ (SELECT VARIABLE_VALUE FROM performance_schema.global_status
+ WHERE VARIABLE_NAME = 'Threads_connected') AS current_connections,
+ ROUND(
+ (SELECT VARIABLE_VALUE FROM performance_schema.global_status
+ WHERE VARIABLE_NAME = 'Threads_connected') * 8 / 1024, 2
+) AS estimated_conn_memory_gb;
 ```
 
 ---

@@ -54,8 +54,8 @@ The **nested loop join (NLJ)** is MySQL's default. For each outer table row, the
 
 ```sql
 -- Control hash join via optimizer_switch (block_nested_loop controls it in 8.0.19+)
-SET optimizer_switch = 'block_nested_loop=on';    -- Enable
-SELECT /*+ NO_BNL(t1, t2) */ * FROM t1 JOIN t2 ON t1.a = t2.a;  -- Disable per-query
+SET optimizer_switch = 'block_nested_loop=on'; -- Enable
+SELECT /*+ NO_BNL(t1, t2) */ * FROM t1 JOIN t2 ON t1.a = t2.a; -- Disable per-query
 ```
 
 **Batched Key Access (BKA)** accumulates rows from the first operand in a join buffer, then performs index lookups in batch through the MRR interface, converting random I/O to sequential access [^8^]. Enable with `SET optimizer_switch='mrr=on,mrr_cost_based=off,batched_key_access=on'`. BKA requires all three flags — `mrr_cost_based=off` because the cost model is too pessimistic. Verify with `Using join buffer (Batched Key Access)` in `EXPLAIN`.
@@ -97,9 +97,9 @@ The `condition_fanout_filter` flag of `optimizer_switch` controls whether histog
 
 ### The Critical Limitation: No Query Plan Management
 
-Critically, Aurora's **Query Plan Management (QPM)** — recording, evaluating, and enforcing known good plans — is available only for Aurora PostgreSQL via `apg_plan_mgmt`, not for Aurora MySQL [^QPM^]. This is one of the most significant capability gaps between the two engines. Aurora PostgreSQL DBAs can capture baseline plans, detect regressions automatically, and force approved plans when the optimizer chooses poorly. Aurora MySQL DBAs have none of this.
+Critically, Aurora's **Query Plan Management (QPM)** — recording, evaluating, and enforcing known good plans — is available only for Aurora PostgreSQL via `apg_plan_mgmt`, not for Aurora MySQL. This is one of the most significant capability gaps between the two engines. Aurora PostgreSQL DBAs can capture baseline plans, detect regressions automatically, and force approved plans when the optimizer chooses poorly. Aurora MySQL DBAs have none of this.
 
-Plan stability must be achieved through `optimizer_switch` flags, index hints (`USE INDEX`, `FORCE INDEX`), `STRAIGHT_JOIN`, and query rewriting. After any upgrade to 3.x, expect regressions: run `ANALYZE TABLE` on all major tables, review critical plans with `EXPLAIN ANALYZE`, create histograms for skewed columns, and have optimizer hints ready. Aurora MySQL 3.x also gains descending indexes (eliminating `filesort` for `ORDER BY ... DESC`), functional indexes on expressions, invisible indexes for safe removal testing, CTE support, window functions, and skip scan — which allows efficient index usage even when the leading column of a composite index is not constrained [^497^]. After upgrade, queries that previously used workarounds may get better plans, but queries that relied on specific 5.7 optimizer behavior may regress.
+Plan stability must be achieved through `optimizer_switch` flags, index hints (`USE INDEX`, `FORCE INDEX`), `STRAIGHT_JOIN`, and query rewriting. After any upgrade to 3.x, expect regressions: run `ANALYZE TABLE` on all major tables, review critical plans with `EXPLAIN ANALYZE`, create histograms for skewed columns, and have optimizer hints ready. Aurora MySQL 3.x also gains descending indexes (eliminating `filesort` for `ORDER BY... DESC`), functional indexes on expressions, invisible indexes for safe removal testing, CTE support, window functions, and skip scan — which allows efficient index usage even when the leading column of a composite index is not constrained [^497^]. After upgrade, queries that previously used workarounds may get better plans, but queries that relied on specific 5.7 optimizer behavior may regress.
 
 Aurora MySQL 2.x had a custom hash join implementation for parallel queries; 3.x adopts the community MySQL 8.0 native hash join [^497^]. The query cache, present in 2.x, was removed in 3.x — workloads that relied on it must migrate to application-level caching (Redis/Memcached) or ProxySQL query cache, which showed a 5.2x improvement over uncached execution in AWS testing [^497^].
 
@@ -188,7 +188,7 @@ Keyset pagination requires an unambiguous ordering column and does not support a
 ```sql
 SELECT o.* FROM orders o
 INNER JOIN (
-    SELECT id FROM orders ORDER BY created_at LIMIT 10 OFFSET 100000
+ SELECT id FROM orders ORDER BY created_at LIMIT 10 OFFSET 100000
 ) ids USING (id);
 ```
 
@@ -201,11 +201,11 @@ The Performance Schema provides production-safe query analysis. `events_statemen
 ```sql
 -- Find queries scanning far more rows than returned
 SELECT
-    DIGEST_TEXT AS query_pattern,
-    COUNT_STAR AS exec_count,
-    SUM_ROWS_EXAMINED AS total_rows_examined,
-    SUM_ROWS_SENT AS total_rows_sent,
-    ROUND(SUM_ROWS_EXAMINED / NULLIF(SUM_ROWS_SENT, 0), 2) AS examined_per_sent
+ DIGEST_TEXT AS query_pattern,
+ COUNT_STAR AS exec_count,
+ SUM_ROWS_EXAMINED AS total_rows_examined,
+ SUM_ROWS_SENT AS total_rows_sent,
+ ROUND(SUM_ROWS_EXAMINED / NULLIF(SUM_ROWS_SENT, 0), 2) AS examined_per_sent
 FROM performance_schema.events_statements_summary_by_digest
 WHERE SUM_ROWS_EXAMINED > SUM_ROWS_SENT * 100
 ORDER BY examined_per_sent DESC LIMIT 10;
@@ -215,7 +215,7 @@ An `examined_per_sent` ratio above 1,000 signals missing indexes or suboptimal a
 
 ```bash
 pt-query-digest --filter '$event->{Rows_examined} / $event->{Rows_sent} > 1000' \
-    --type=slowlog /var/lib/mysql/slow.log
+ --type=slowlog /var/lib/mysql/slow.log
 ```
 
 The `sys.statements_with_runtimes_in_95th_percentile` view provides quick outlier identification:
