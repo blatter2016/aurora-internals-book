@@ -25,4 +25,3 @@ teaser-word-count = 30
 use-boolean-and = true
 boost-hierarchy = 2
 boost-paragraph = 1
-boost-hierarchy-duplicate = 1
