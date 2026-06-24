@@ -228,26 +228,26 @@ The following Mermaid diagram shows the HLL diagnosis workflow that should be fo
 
 ```mermaid
 flowchart TD
-    A[HLL alert fires: >10,000] --> B[Connect to writer: SHOW ENGINE INNODB STATUS]
-    B --> C{HLL trending up?}
-    C -->|Yes| D[Query mysql.ro_replica_status]
-    C -->|No / stable| Z[Monitor; alert resolves itself]
-    D --> E{Lowest oldest_read_view_trx_id on reader?}
-    E -->|Yes| F[Connect to blocking reader]
-    E -->|No (writer has oldest)| G[Query innodb_trx on writer]
-    F --> H{Find trx >5 min in innodb_trx?}
-    H -->|Yes| I[Kill transaction: CALL mysql.rds_kill_query(id)]
-    H -->|No| J[Check application connection pool for idle transactions]
-    G --> K{Blocking transaction found?}
-    K -->|Yes| I
-    K -->|No| L[Check for application bug: uncommitted DML, ORM session leak]
-    I --> M[Monitor HLL: should drop within 10-30 minutes]
+    A["HLL alert fires: >10,000"] --> B["Connect to writer: SHOW ENGINE INNODB STATUS"]
+    B --> C{"HLL trending up?"}
+    C -->|"Yes"| D["Query mysql.ro_replica_status"]
+    C -->|"No / stable"| Z["Monitor; alert resolves itself"]
+    D --> E{"Lowest oldest_read_view_trx_id on reader?"}
+    E -->|"Yes"| F["Connect to blocking reader"]
+    E -->|"No (writer has oldest)"| G["Query innodb_trx on writer"]
+    F --> H{"Find trx >5 min in innodb_trx?"}
+    H -->|"Yes"| I["Kill transaction: CALL mysql.rds_kill_query(id)"]
+    H -->|"No"| J["Check application connection pool for idle transactions"]
+    G --> K{"Blocking transaction found?"}
+    K -->|"Yes"| I
+    K -->|"No"| L["Check for application bug: uncommitted DML, ORM session leak"]
+    I --> M["Monitor HLL: should drop within 10-30 minutes"]
     J --> M
     L --> M
-    M --> N{HLL drops?}
-    N -->|Yes| O[Post-incident: implement READ COMMITTED on readers]
-    N -->|No after 30 min| P[Investigate: high write rate overwhelming purge threads]
-    P --> Q[Tune innodb_purge_threads + innodb_purge_batch_size]
+    M --> N{"HLL drops?"}
+    N -->|"Yes"| O["Post-incident: implement READ COMMITTED on readers"]
+    N -->|"No after 30 min"| P["Investigate: high write rate overwhelming purge threads"]
+    P --> Q["Tune innodb_purge_threads + innodb_purge_batch_size"]
 ```
 
 **Figure 5.1**: HLL diagnosis and remediation workflow. The critical decision point is `mysql.ro_replica_status`: a reader with the lowest `oldest_read_view_trx_id` is the purge blocker. Do not reboot instances at high HLL — this destroys the survivable page cache and forces slower storage-level purge with additional I/O billing costs [^59^].

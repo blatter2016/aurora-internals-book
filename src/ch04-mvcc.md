@@ -115,15 +115,15 @@ The following Mermaid diagram illustrates the version chain traversal that occur
 
 ```mermaid
 graph TD
-    A[Consistent Read:<br/>SELECT * FROM orders WHERE id = 42] --> B[Read current row<br/>from clustered index]
-    B --> C[Extract DB_TRX_ID<br/>from row header]
-    C --> D{ReadView::changes_visible<br/>(trx_id)?}
-    D -->|id < up_limit_id<br/>or id == creator_id| E[Return row to client]
-    D -->|id >= low_limit_id<br/>or id in m_ids| F[Follow DB_ROLL_PTR<br/>to undo log record]
-    F --> G[trx_undo_prev_version_build:<br/>reconstruct previous version]
-    G --> H[Extract trx_id from<br/>reconstructed version]
+    A["Consistent Read:<br/>SELECT * FROM orders WHERE id = 42"] --> B["Read current row<br/>from clustered index"]
+    B --> C["Extract DB_TRX_ID<br/>from row header"]
+    C --> D{"ReadView::changes_visible<br/>(trx_id)?"}
+    D -->|"id < up_limit_id<br/>or id == creator_id"| E["Return row to client"]
+    D -->|"id >= low_limit_id<br/>or id in m_ids"| F["Follow DB_ROLL_PTR<br/>to undo log record"]
+    F --> G["trx_undo_prev_version_build:<br/>reconstruct previous version"]
+    G --> H["Extract trx_id from<br/>reconstructed version"]
     H --> D
-    F -->|roll_ptr is NULL<br/>(end of chain)| I[No visible version exists<br/>return 'not found' to client]
+    F -->|"roll_ptr is NULL<br/>(end of chain)"| I["No visible version exists<br/>return 'not found' to client"]
 
     style E fill:#e8f5e9
     style I fill:#ffebee

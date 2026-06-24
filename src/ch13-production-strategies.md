@@ -20,16 +20,16 @@ As HLL grows, queries slow down. Slow queries hold connections longer, increasin
 
 ```mermaid
 graph TD
-    A[Long-running SELECT on reader] -->|Opens read view| B[Blocks writer purge]
-    B -->|Undo records accumulate| C[HLL grows]
-    C -->|Version chain lengthens| D[Queries slow down]
-    D -->|CPU consumed by traversal| E[Reader falls behind]
-    D -->|Connections held longer| F[Writer contention rises]
-    E -->|Cache stale| G[Replica lag increases]
-    G -->|More catch-up at promotion| H[Failover time extends]
-    C -->|More MVCC state| H
-    H -->|Cold buffer pool + high HLL| I[30-50% perf degradation<br/>10-30 minutes post-failover]
-    F -->|Writer overloaded| J[Failover triggered]
+    A["Long-running SELECT on reader"] -->|"Opens read view"| B["Blocks writer purge"]
+    B -->|"Undo records accumulate"| C["HLL grows"]
+    C -->|"Version chain lengthens"| D["Queries slow down"]
+    D -->|"CPU consumed by traversal"| E["Reader falls behind"]
+    D -->|"Connections held longer"| F["Writer contention rises"]
+    E -->|"Cache stale"| G["Replica lag increases"]
+    G -->|"More catch-up at promotion"| H["Failover time extends"]
+    C -->|"More MVCC state"| H
+    H -->|"Cold buffer pool + high HLL"| I["30-50% perf degradation<br/>10-30 minutes post-failover"]
+    F -->|"Writer overloaded"| J["Failover triggered"]
     J --> H
 
     style A fill:#ffcccc
