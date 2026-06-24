@@ -228,14 +228,14 @@ The following Mermaid diagram shows the HLL diagnosis workflow that should be fo
 
 ```mermaid
 flowchart TD
-    A["HLL alert fires: >10,000"] --> B["Connect to writer: SHOW ENGINE INNODB STATUS"]
+    A["HLL alert fires (over 10,000)"] --> B["Connect to writer: SHOW ENGINE INNODB STATUS"]
     B --> C{"HLL trending up?"}
     C -->|"Yes"| D["Query mysql.ro_replica_status"]
     C -->|"No / stable"| Z["Monitor; alert resolves itself"]
     D --> E{"Lowest oldest_read_view_trx_id on reader?"}
     E -->|"Yes"| F["Connect to blocking reader"]
     E -->|"No (writer has oldest)"| G["Query innodb_trx on writer"]
-    F --> H{"Find trx >5 min in innodb_trx?"}
+    F --> H{"Find trx over 5 min in innodb_trx?"}
     H -->|"Yes"| I["Kill transaction: CALL mysql.rds_kill_query(id)"]
     H -->|"No"| J["Check application connection pool for idle transactions"]
     G --> K{"Blocking transaction found?"}
