@@ -176,29 +176,29 @@ The failover continuum in Aurora spans from the storage layer's synchronous quor
 
 We've traced writes from buffer pool to storage to replicas. But what about the queries that READ this data? Chapter 9 examines how Aurora executes queries, optimizes plans, and surfaces performance problems — bringing together everything we have learned about storage, transactions, and the pipeline to diagnose and fix the queries that drive your application.
 
-[^2^]: AWS Documentation, "Amazon Aurora Storage Overview."
-[^6^]: AWS Documentation, "Monitoring Aurora Replication with Amazon CloudWatch."
-[^11^]: AWS Documentation, "Aurora Read Consistency Model."
-[^15^]: AWS Documentation, "Doublewrite Buffer Elimination in Aurora."
-[^28^]: AWS re:Invent 2018, Aurora Deep Dive Session.
-[^29^]: AWS Documentation, "VDL Truncation and Epoch Fencing."
-[^59^]: AWS Documentation, "Aurora MySQL Wait Events."
-[^134^]: AWS Documentation, "Aurora Global Database RTO/RPO."
-[^157^]: AWS Documentation, "Reader Restart and HLL Growth."
-[^168^]: AWS re:Post, "Replica Lag Metric vs Actual Staleness."
-[^211^]: AWS Documentation, "Aurora Failover Benchmarks."
-[^329^]: AWS Documentation, "Aurora Best Practices — Endpoints and Failover."
-[^331^]: AWS Documentation, "Aurora Custom Endpoints."
-[^333^]: AWS Documentation, "Aurora RPO Guarantees."
-[^334^]: AWS Documentation, "Aurora Failover Timing Statistics."
-[^340^]: AWS Documentation, "DNS and JVM Caching with Aurora."
-[^345^]: AWS Documentation, "RDS Proxy for Aurora."
-[^359^]: AWS Documentation, "AWS Advanced JDBC Driver for Aurora."
-[^364^]: AWS re:Post, "RDS Proxy Session Pinning Diagnosis."
-[^368^]: AWS Documentation, "RDS Proxy Session Pinning Causes."
-[^370^]: AWS Documentation, "Aurora Global DB Replication Lag."
-[^373^]: AWS Documentation, "Failover Testing Best Practices."
-[^481^]: AWS Documentation, "CloudWatch Database Insights — Standard vs Advanced."
-[^482^]: AWS Documentation, "Performance Insights End of Life Notice."
-[^491^]: AWS Documentation, "Migrating from Performance Insights to Database Insights."
-[^497^]: Aurora MySQL 3.x Release Notes and Optimizer Documentation.
+[^2^]: [AWS Documentation, "Amazon Aurora Storage Overview."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Storage.html)
+[^6^]: [AWS Documentation, "Monitoring Aurora Replication with Amazon CloudWatch."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Replication.Monitoring.html)
+[^11^]: [AWS Documentation, "Aurora Read Consistency Model."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Replication.html)
+[^15^]: [AWS Documentation, "Doublewrite Buffer Elimination in Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Performance.html)
+[^28^]: [AWS re:Invent 2018, Aurora Deep Dive Session.](https://www.youtube.com/watch?v=3PshvYmTv9M)
+[^29^]: [AWS Documentation, "VDL Truncation and Epoch Fencing."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^59^]: [AWS Documentation, "Aurora MySQL Wait Events."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Monitoring.html)
+[^134^]: [AWS Documentation, "Aurora Global Database RTO/RPO."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-global-database.html)
+[^157^]: [AWS Documentation, "Reader Restart and HLL Growth."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Replication.html)
+[^168^]: [AWS re:Post, "Replica Lag Metric vs Actual Staleness."](https://repost.aws/questions/QUPnZ8n_BURnOvfQvTeBaPGQ/most-accurate-way-to-measure-the-replica-lag-in-rds-postgres)
+[^211^]: [AWS Documentation, "Aurora Failover Benchmarks."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Reliability.html)
+[^329^]: [AWS Documentation, "Aurora Best Practices — Endpoints and Failover."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.BestPractices.html)
+[^331^]: [AWS Documentation, "Aurora Custom Endpoints."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.CustomEndpoints.html)
+[^333^]: [AWS Documentation, "Aurora RPO Guarantees."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-global-database.html)
+[^334^]: [AWS Documentation, "Aurora Failover Timing Statistics."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Reliability.html)
+[^340^]: [AWS Documentation, "DNS and JVM Caching with Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.BestPractices.html)
+[^345^]: [AWS Documentation, "RDS Proxy for Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/rds-proxy.html)
+[^359^]: [AWS Documentation, "AWS Advanced JDBC Driver for Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/CHAP_Aurora.html)
+[^364^]: [AWS re:Post, "RDS Proxy Session Pinning Diagnosis."](https://repost.aws/knowledge-center/rds-proxy-connection-pinning-issues)
+[^368^]: [AWS Documentation, "RDS Proxy Session Pinning Causes."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/rds-proxy.html)
+[^370^]: [AWS Documentation, "Aurora Global DB Replication Lag."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-global-database.html)
+[^373^]: [AWS Documentation, "Failover Testing Best Practices."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.BestPractices.html)
+[^481^]: [AWS Documentation, "CloudWatch Database Insights — Standard vs Advanced."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/dbinsights.html)
+[^482^]: [AWS Documentation, "Performance Insights End of Life Notice."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/USER_PerfInsights.html)
+[^491^]: [AWS Documentation, "Migrating from Performance Insights to Database Insights."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/dbinsights.html)
+[^497^]: [Aurora MySQL 3.x Release Notes and Optimizer Documentation.](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Updates.html)

@@ -148,37 +148,37 @@ The post-failover risk is a cold buffer pool. If the promoted instance was a sma
 
 The write path explains how a single instance survives. But Aurora is a distributed system. Chapter 8 follows the same write as it reaches read replicas — tracing how log records propagate, how the two-layer consistency model affects what applications see, and what happens when the writer fails and a reader must take its place.
 
-[^1^]: Verbitski et al., "Amazon Aurora: Design Considerations for High Throughput Cloud-Native Relational Databases," SIGMOD 2017.
-[^2^]: AWS Documentation, "Amazon Aurora Storage Overview."
-[^3^]: AWS Documentation, "Amazon Aurora: How It Works — Storage."
-[^5^]: Aurora Architecture Deep Dive, "Segment Complete LSN and Log Chains."
-[^7^]: AWS Documentation, "Mini-Transactions and Consistency Points in Aurora."
-[^10^]: AWS Documentation, "Aurora Quorum Model — 4/6 Writes Across 3 AZs."
-[^15^]: AWS Documentation, "Doublewrite Buffer Elimination in Aurora."
-[^16^]: AWS Documentation, "Checkpointing in Standard MySQL vs Aurora."
-[^17^]: AWS Documentation, "Page Materialization in Aurora Storage."
-[^18^]: Verbitski et al., SIGMOD 2017 — Benchmark Results.
-[^20^]: Aurora Storage Internals, "4 KB Log Record Units."
-[^21^]: AWS Documentation, "Aurora Async Commit Architecture."
-[^22^]: AWS Documentation, "Aurora Commit Thread Behavior."
-[^23^]: AWS Documentation, "innodb_flush_log_at_trx_commit in Aurora."
-[^24^]: AWS Documentation, "Boxcar Batching Mechanism."
-[^25^]: AWS Documentation, "Parameters Not Applicable to Aurora MySQL."
-[^27^]: AWS Documentation, "Aurora Crash Recovery — 97% Faster."
-[^28^]: AWS re:Invent 2018, Aurora Deep Dive Session.
-[^29^]: AWS Documentation, "VDL Truncation and Epoch Fencing."
-[^30^]: AWS Documentation, "Fast Binlog Recovery in Aurora."
-[^31^]: AWS Documentation, "Aurora Failover Timing Statistics."
-[^32^]: AWS Documentation, "Aurora Read Replica Architecture."
-[^33^]: AWS Documentation, "Typical Replica Lag — 20ms."
-[^34^]: Aurora Architecture, "Survivable Page Cache."
-[^35^]: AWS Documentation, "Reader Behavior During Failover (Aurora MySQL 2.10+)."
-[^40^]: Aurora Storage Internals, "Completeness vs Durability — VCL vs VDL."
+[^1^]: [Verbitski et al., "Amazon Aurora: Design Considerations for High Throughput Cloud-Native Relational Databases," SIGMOD 2017.](https://dl.acm.org/doi/10.1145/3035918.3056101)
+[^2^]: [AWS Documentation, "Amazon Aurora Storage Overview."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Storage.html)
+[^3^]: [AWS Documentation, "Amazon Aurora: How It Works — Storage."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/CHAP_Aurora.html)
+[^5^]: [Aurora Architecture Deep Dive, "Segment Complete LSN and Log Chains."](https://aws.amazon.com/blogs/database/introducing-the-aurora-storage-engine/)
+[^7^]: [AWS Documentation, "Mini-Transactions and Consistency Points in Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^10^]: [AWS Documentation, "Aurora Quorum Model — 4/6 Writes Across 3 AZs."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^15^]: [AWS Documentation, "Doublewrite Buffer Elimination in Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Performance.html)
+[^16^]: [AWS Documentation, "Checkpointing in Standard MySQL vs Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Monitoring.html)
+[^17^]: [AWS Documentation, "Page Materialization in Aurora Storage."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^18^]: [Verbitski et al., SIGMOD 2017 — Benchmark Results.](https://dl.acm.org/doi/10.1145/3035918.3056101)
+[^20^]: [Aurora Storage Internals, "4 KB Log Record Units."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^21^]: [AWS Documentation, "Aurora Async Commit Architecture."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^22^]: [AWS Documentation, "Aurora Commit Thread Behavior."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Performance.html)
+[^23^]: [AWS Documentation, "innodb_flush_log_at_trx_commit in Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Reference.Parameters.html)
+[^24^]: [AWS Documentation, "Boxcar Batching Mechanism."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^25^]: [AWS Documentation, "Parameters Not Applicable to Aurora MySQL."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Reference.ParameterDifferences.html)
+[^27^]: [AWS Documentation, "Aurora Crash Recovery — 97% Faster."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^28^]: [AWS re:Invent 2018, Aurora Deep Dive Session.](https://www.youtube.com/watch?v=3PshvYmTv9M)
+[^29^]: [AWS Documentation, "VDL Truncation and Epoch Fencing."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^30^]: [AWS Documentation, "Fast Binlog Recovery in Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Replication.html)
+[^31^]: [AWS Documentation, "Aurora Failover Timing Statistics."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Reliability.html)
+[^32^]: [AWS Documentation, "Aurora Read Replica Architecture."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Replication.html)
+[^33^]: [AWS Documentation, "Typical Replica Lag — 20ms."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Replication.html)
+[^34^]: [Aurora Architecture, "Survivable Page Cache."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^35^]: [AWS Documentation, "Reader Behavior During Failover (Aurora MySQL 2.10+)."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Replication.html)
+[^40^]: [Aurora Storage Internals, "Completeness vs Durability — VCL vs VDL."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
 [^AWS re:Post^]: AWS re:Post, "Understanding io/aurora_redo_log_flush Wait Events."
 [^QPM^]: AWS Documentation, "Query Plan Management — Aurora PostgreSQL Only."
-[^457^]: MySQL 8.0 Reference Manual, "EXPLAIN Statement."
-[^59^]: AWS Documentation, "Aurora MySQL Wait Events."
-[^481^]: AWS Documentation, "CloudWatch Database Insights — Standard vs Advanced."
-[^482^]: AWS Documentation, "Performance Insights End of Life Notice."
-[^491^]: AWS Documentation, "Migrating from Performance Insights to Database Insights."
-[^497^]: Aurora MySQL 3.x Release Notes and Optimizer Documentation.
+[^457^]: [MySQL 8.0 Reference Manual, "EXPLAIN Statement."](https://dev.mysql.com/doc/refman/8.0/en/explain-output.html)
+[^59^]: [AWS Documentation, "Aurora MySQL Wait Events."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Monitoring.html)
+[^481^]: [AWS Documentation, "CloudWatch Database Insights — Standard vs Advanced."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/dbinsights.html)
+[^482^]: [AWS Documentation, "Performance Insights End of Life Notice."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/USER_PerfInsights.html)
+[^491^]: [AWS Documentation, "Migrating from Performance Insights to Database Insights."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/dbinsights.html)
+[^497^]: [Aurora MySQL 3.x Release Notes and Optimizer Documentation.](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Updates.html)
