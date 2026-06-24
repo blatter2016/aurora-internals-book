@@ -1,5 +1,7 @@
 # Aurora MySQL Internals: A Production Engineer's Deep Guide
 
+**Live book:** [https://blatter2016.github.io/aurora-internals-book/](https://blatter2016.github.io/aurora-internals-book/)
+
 This repository contains the source for an mdBook covering Aurora MySQL internals, from storage architecture and the buffer pool through replication, query optimization, and production operations.
 
 ## Build locally
