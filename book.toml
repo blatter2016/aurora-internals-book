@@ -12,7 +12,6 @@ create-missing = false
 default-theme = "light"
 preferred-dark-theme = "navy"
 mathjax-support = true
-copy-fonts = true
 no-section-label = false
 
 [output.html.fold]
