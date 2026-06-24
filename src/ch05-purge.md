@@ -287,3 +287,11 @@ The maximum is 32, but values above 8 rarely provide additional benefit and can 
 The purge system gives no warning until the damage is severe — a healthy HLL of 500 can become 500,000 in the span of one long-running report query. The defense is threefold: alert on HLL before it becomes symptomatic, diagnose with `mysql.ro_replica_status` to find the exact blocking instance, and remediate by killing the blocking transaction — never by rebooting. The DBA who internalizes this workflow avoids the most common and most destructive failure mode in Aurora MySQL.
 
 Purge failures are a specific kind of concurrency problem. But they're not the only one. Chapter 6 examines the broader landscape of locks and deadlocks — the everyday concurrency control that every production DBA must understand.
+
+
+## References
+
+[^15^]: [AWS Documentation, "Doublewrite Buffer Elimination in Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Performance.html)
+[^16^]: [AWS Documentation, "Checkpointing in Standard MySQL vs Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Monitoring.html)
+[^59^]: [AWS Documentation, "Aurora MySQL Wait Events."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Monitoring.html)
+[^331^]: [AWS Documentation, "Aurora Custom Endpoints."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.CustomEndpoints.html)

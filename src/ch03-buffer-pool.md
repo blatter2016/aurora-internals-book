@@ -329,3 +329,17 @@ The buffer pool is Aurora's most critical resource because it is simultaneously 
 ---
 
 The buffer pool caches pages. But what happens when a transaction changes data on a page? Chapter 4 introduces MVCC — the mechanism that makes readers and writers coexist without blocking each other.
+
+
+## References
+
+[^2^]: [AWS Documentation, "Amazon Aurora Storage Overview."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Storage.html)
+[^3^]: [AWS Documentation, "Amazon Aurora: How It Works — Storage."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/CHAP_Aurora.html)
+[^6^]: [AWS Documentation, "Monitoring Aurora Replication with Amazon CloudWatch."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Replication.Monitoring.html)
+[^15^]: [AWS Documentation, "Doublewrite Buffer Elimination in Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Performance.html)
+[^23^]: [AWS Documentation, "innodb_flush_log_at_trx_commit in Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Reference.Parameters.html)
+[^27^]: [AWS Documentation, "Aurora Crash Recovery — 97% Faster."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^29^]: [AWS Documentation, "VDL Truncation and Epoch Fencing."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^40^]: [Aurora Storage Internals, "Completeness vs Durability — VCL vs VDL."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^59^]: [AWS Documentation, "Aurora MySQL Wait Events."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Monitoring.html)
+[^334^]: [AWS Documentation, "Aurora Failover Timing Statistics."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Reliability.html)

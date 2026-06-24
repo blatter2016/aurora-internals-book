@@ -290,3 +290,8 @@ A reader with a very old `oldest_read_view_trx_id` relative to the writer is lik
 We've now explored the complete transaction engine: how reads work (MVCC), how cleanup works (purge), and how writes are coordinated (locks). The three chapters of this part trace a single arc — from the 13 hidden bytes on every row that encode transaction lineage, through the read views that decide which versions are visible, to the purge system that must clean them up, and finally to the locks that prevent concurrent writes from corrupting the data. Each mechanism is elegant in isolation; together, they form the most sophisticated concurrency control system in production database engineering.
 
 But how do changes actually survive? Part III follows a write from the buffer pool, through the redo log, to storage, and out to replicas.
+
+
+## References
+
+[^59^]: [AWS Documentation, "Aurora MySQL Wait Events."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Monitoring.html)

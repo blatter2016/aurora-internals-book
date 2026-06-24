@@ -295,3 +295,16 @@ Placing HLL, buffer cache, and replica lag at the top trains operators to check 
 ---
 
 Monitoring tells you something is wrong. Planning prevents things from going wrong in the first place. Chapter 11 covers instance selection, sizing methodology, and cost optimization — building on the buffer pool sizing principles from Chapter 3, the purge-reader interaction from Chapter 5, and the replication insights from Chapter 8 to design clusters that are correct from day one.
+
+
+## References
+
+[^1^]: [Verbitski et al., "Amazon Aurora: Design Considerations for High Throughput Cloud-Native Relational Databases," SIGMOD 2017.](https://dl.acm.org/doi/10.1145/3035918.3056101)
+[^8^]: [MySQL 8.0 Reference Manual, "Optimization."](https://dev.mysql.com/doc/refman/8.0/en/optimization.html)
+[^29^]: [AWS Documentation, "VDL Truncation and Epoch Fencing."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^59^]: [AWS Documentation, "Aurora MySQL Wait Events."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Monitoring.html)
+[^331^]: [AWS Documentation, "Aurora Custom Endpoints."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.CustomEndpoints.html)
+[^457^]: [MySQL 8.0 Reference Manual, "EXPLAIN Statement."](https://dev.mysql.com/doc/refman/8.0/en/explain-output.html)
+[^482^]: [AWS Documentation, "Performance Insights End of Life Notice."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/USER_PerfInsights.html)
+[^491^]: [AWS Documentation, "Migrating from Performance Insights to Database Insights."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/dbinsights.html)
+[^497^]: [Aurora MySQL 3.x Release Notes and Optimizer Documentation.](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Updates.html)

@@ -209,3 +209,9 @@ The memory overhead of Performance Schema is typically 100–500 MB depending on
 ---
 
 Parameters are individual knobs. But production systems fail at the intersections — where a reader read view meets a blocked purge thread, where a cold buffer pool meets a failover event, where a parameter change meets an unexpected workload pattern. Chapter 13 integrates everything into a unified operational framework, mapping the cross-dimensional cascade patterns that emerge when you hold all thirteen chapters in your head at once.
+
+
+## References
+
+[^23^]: [AWS Documentation, "innodb_flush_log_at_trx_commit in Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Reference.Parameters.html)
+[^25^]: [AWS Documentation, "Parameters Not Applicable to Aurora MySQL."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Reference.ParameterDifferences.html)

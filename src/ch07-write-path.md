@@ -174,11 +174,3 @@ The write path explains how a single instance survives. But Aurora is a distribu
 [^34^]: [Aurora Architecture, "Survivable Page Cache."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
 [^35^]: [AWS Documentation, "Reader Behavior During Failover (Aurora MySQL 2.10+)."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Replication.html)
 [^40^]: [Aurora Storage Internals, "Completeness vs Durability — VCL vs VDL."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
-[^AWS re:Post^]: AWS re:Post, "Understanding io/aurora_redo_log_flush Wait Events."
-[^QPM^]: AWS Documentation, "Query Plan Management — Aurora PostgreSQL Only."
-[^457^]: [MySQL 8.0 Reference Manual, "EXPLAIN Statement."](https://dev.mysql.com/doc/refman/8.0/en/explain-output.html)
-[^59^]: [AWS Documentation, "Aurora MySQL Wait Events."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Monitoring.html)
-[^481^]: [AWS Documentation, "CloudWatch Database Insights — Standard vs Advanced."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/dbinsights.html)
-[^482^]: [AWS Documentation, "Performance Insights End of Life Notice."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/USER_PerfInsights.html)
-[^491^]: [AWS Documentation, "Migrating from Performance Insights to Database Insights."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/dbinsights.html)
-[^497^]: [Aurora MySQL 3.x Release Notes and Optimizer Documentation.](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Updates.html)

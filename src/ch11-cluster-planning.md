@@ -239,3 +239,8 @@ SELECT
 ---
 
 Planning sets the foundation. Parameters are the knobs you turn day-to-day. Chapter 12 separates the parameters that matter from the parameter delusion — building on the buffer pool insights from Chapter 3, the purge mechanics from Chapter 5, the locking behavior from Chapter 6, and the write path analysis from Chapter 7 to show exactly which tunables have production impact and which are architectural distractions.
+
+
+## References
+
+[^331^]: [AWS Documentation, "Aurora Custom Endpoints."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.CustomEndpoints.html)

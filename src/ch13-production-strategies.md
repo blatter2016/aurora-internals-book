@@ -166,3 +166,19 @@ You started this book understanding Aurora as "MySQL on AWS." You end it underst
 The architecture decisions that make Aurora fast are the same ones that make it fragile. Shared storage eliminates replication lag but creates cross-instance purge blocking. Async commits enable high write throughput but concentrate undo pressure on a single writer. The survivable page cache preserves buffer pool state across restarts but cannot transfer it to a promoted failover target. Log-structured storage eliminates write amplification but removes the isolation boundaries that standard MySQL provides between instances. Knowing both sides is the job.
 
 The cross-cutting insight that unifies all thirteen chapters is this: Aurora simplifies storage and replication at the cost of concentrating failure modes into a small number of cross-instance interactions. A single reader's read view, a single DDL statement, a single connection spike — each can propagate cluster-wide because the shared storage removes the isolation boundaries that standard MySQL provides. The production strategies in this chapter exist to detect, contain, and recover from that propagation before it becomes an outage. The teams that master these patterns run clusters that don't page them at 3 AM. The teams that don't learn about them the hard way — one cascade at a time.
+
+
+## References
+
+[^7^]: [AWS Documentation, "Mini-Transactions and Consistency Points in Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^8^]: [MySQL 8.0 Reference Manual, "Optimization."](https://dev.mysql.com/doc/refman/8.0/en/optimization.html)
+[^15^]: [AWS Documentation, "Doublewrite Buffer Elimination in Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Performance.html)
+[^16^]: [AWS Documentation, "Checkpointing in Standard MySQL vs Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Monitoring.html)
+[^22^]: [AWS Documentation, "Aurora Commit Thread Behavior."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Performance.html)
+[^23^]: [AWS Documentation, "innodb_flush_log_at_trx_commit in Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Reference.Parameters.html)
+[^25^]: [AWS Documentation, "Parameters Not Applicable to Aurora MySQL."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Reference.ParameterDifferences.html)
+[^27^]: [AWS Documentation, "Aurora Crash Recovery — 97% Faster."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^40^]: [Aurora Storage Internals, "Completeness vs Durability — VCL vs VDL."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^59^]: [AWS Documentation, "Aurora MySQL Wait Events."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Monitoring.html)
+[^331^]: [AWS Documentation, "Aurora Custom Endpoints."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.CustomEndpoints.html)
+[^334^]: [AWS Documentation, "Aurora Failover Timing Statistics."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Reliability.html)

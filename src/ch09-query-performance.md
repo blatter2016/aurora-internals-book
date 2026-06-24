@@ -236,15 +236,7 @@ But knowledge isn't enough — you need to run it. Part IV moves from understand
 
 [^8^]: [MySQL 8.0 Reference Manual, "Optimization."](https://dev.mysql.com/doc/refman/8.0/en/optimization.html)
 [^59^]: [AWS Documentation, "Aurora MySQL Wait Events."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Monitoring.html)
-[^168^]: [AWS re:Post, "Replica Lag Metric vs Actual Staleness."](https://repost.aws/questions/QUPnZ8n_BURnOvfQvTeBaPGQ/most-accurate-way-to-measure-the-replica-lag-in-rds-postgres)
-[^211^]: [AWS Documentation, "Aurora Failover Benchmarks."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Reliability.html)
-[^329^]: [AWS Documentation, "Aurora Best Practices — Endpoints and Failover."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.BestPractices.html)
-[^334^]: [AWS Documentation, "Aurora Failover Timing Statistics."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Reliability.html)
-[^340^]: [AWS Documentation, "DNS and JVM Caching with Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.BestPractices.html)
 [^457^]: [MySQL 8.0 Reference Manual, "EXPLAIN Statement."](https://dev.mysql.com/doc/refman/8.0/en/explain-output.html)
 [^481^]: [AWS Documentation, "CloudWatch Database Insights — Standard vs Advanced."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/dbinsights.html)
 [^482^]: [AWS Documentation, "Performance Insights End of Life Notice."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/USER_PerfInsights.html)
-[^491^]: [AWS Documentation, "Migrating from Performance Insights to Database Insights."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/dbinsights.html)
 [^497^]: [Aurora MySQL 3.x Release Notes and Optimizer Documentation.](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Updates.html)
-[^AWS re:Post^]: AWS re:Post, "Understanding io/aurora_redo_log_flush Wait Events."
-[^QPM^]: AWS Documentation, "Query Plan Management — Aurora PostgreSQL Only."

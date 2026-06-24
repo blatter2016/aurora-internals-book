@@ -256,3 +256,11 @@ For prevention, the operational playbook is:
 5. **Never reboot** to resolve high HLL — kill the offending transaction and let purge work from the warm cache instead.
 
 The mechanism that makes MVCC beautiful — undo logs preserving old row versions so that readers never wait for writers — also creates a garbage collection problem. When cleanup fails, the consequences cascade across the entire cluster. Chapter 5 examines the purge system: InnoDB's garbage collector, and Aurora's silent killer.
+
+
+## References
+
+[^15^]: [AWS Documentation, "Doublewrite Buffer Elimination in Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Performance.html)
+[^16^]: [AWS Documentation, "Checkpointing in Standard MySQL vs Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Monitoring.html)
+[^59^]: [AWS Documentation, "Aurora MySQL Wait Events."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Monitoring.html)
+[^134^]: [AWS Documentation, "Aurora Global Database RTO/RPO."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-global-database.html)

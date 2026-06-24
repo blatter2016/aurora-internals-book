@@ -229,3 +229,33 @@ The shared undo log architecture creates critical coupling between readers and t
 ---
 
 Now that we understand the storage layer, let's look at how InnoDB organizes data within it. Chapter 2 examines the page structure, B+ tree indexes, and row format that sit on top of Aurora's distributed storage.
+
+
+## References
+
+[^1^]: [Verbitski et al., "Amazon Aurora: Design Considerations for High Throughput Cloud-Native Relational Databases," SIGMOD 2017.](https://dl.acm.org/doi/10.1145/3035918.3056101)
+[^2^]: [AWS Documentation, "Amazon Aurora Storage Overview."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Storage.html)
+[^3^]: [AWS Documentation, "Amazon Aurora: How It Works — Storage."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/CHAP_Aurora.html)
+[^5^]: [Aurora Architecture Deep Dive, "Segment Complete LSN and Log Chains."](https://aws.amazon.com/blogs/database/introducing-the-aurora-storage-engine/)
+[^6^]: [AWS Documentation, "Monitoring Aurora Replication with Amazon CloudWatch."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Replication.Monitoring.html)
+[^7^]: [AWS Documentation, "Mini-Transactions and Consistency Points in Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^8^]: [MySQL 8.0 Reference Manual, "Optimization."](https://dev.mysql.com/doc/refman/8.0/en/optimization.html)
+[^10^]: [AWS Documentation, "Aurora Quorum Model — 4/6 Writes Across 3 AZs."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^11^]: [AWS Documentation, "Aurora Read Consistency Model."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Replication.html)
+[^15^]: [AWS Documentation, "Doublewrite Buffer Elimination in Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Performance.html)
+[^16^]: [AWS Documentation, "Checkpointing in Standard MySQL vs Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Monitoring.html)
+[^17^]: [AWS Documentation, "Page Materialization in Aurora Storage."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^18^]: [Verbitski et al., SIGMOD 2017 — Benchmark Results.](https://dl.acm.org/doi/10.1145/3035918.3056101)
+[^20^]: [Aurora Storage Internals, "4 KB Log Record Units."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^21^]: [AWS Documentation, "Aurora Async Commit Architecture."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^22^]: [AWS Documentation, "Aurora Commit Thread Behavior."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Performance.html)
+[^23^]: [AWS Documentation, "innodb_flush_log_at_trx_commit in Aurora."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Reference.Parameters.html)
+[^27^]: [AWS Documentation, "Aurora Crash Recovery — 97% Faster."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^28^]: [AWS re:Invent 2018, Aurora Deep Dive Session.](https://www.youtube.com/watch?v=3PshvYmTv9M)
+[^29^]: [AWS Documentation, "VDL Truncation and Epoch Fencing."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^32^]: [AWS Documentation, "Aurora Read Replica Architecture."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Replication.html)
+[^35^]: [AWS Documentation, "Reader Behavior During Failover (Aurora MySQL 2.10+)."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Replication.html)
+[^40^]: [Aurora Storage Internals, "Completeness vs Durability — VCL vs VDL."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Storage.html)
+[^157^]: [AWS Documentation, "Reader Restart and HLL Growth."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Replication.html)
+[^168^]: [AWS re:Post, "Replica Lag Metric vs Actual Staleness."](https://repost.aws/questions/QUPnZ8n_BURnOvfQvTeBaPGQ/most-accurate-way-to-measure-the-replica-lag-in-rds-postgres)
+[^334^]: [AWS Documentation, "Aurora Failover Timing Statistics."](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Reliability.html)
