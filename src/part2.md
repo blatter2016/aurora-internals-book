@@ -1,0 +1,17 @@
+# Part II: The Engine
+
+We know where data lives. Chapters 1 through 3 mapped the territory: Aurora's storage-compute separation, the 16 KB pages that hold InnoDB rows, and the buffer pool that keeps hot pages in memory. We examined the hidden system columns — `DB_TRX_ID`, `DB_ROLL_PTR`, `DB_ROW_ID` — that occupy 13 bytes at the start of every clustered index record, invisible to `SELECT *` but essential to everything that follows.
+
+Now we ask a harder question: *how does data change?*
+
+A database that only stored static pages would be a warehouse, not an engine. The transaction engine is the core intellectual achievement of InnoDB. It is what allows thousands of concurrent connections to read and write the same rows without corruption, what guarantees that a power failure mid-transaction leaves data consistent, and what creates the invisible infrastructure of old row versions that makes non-locking reads possible. This engine is not abstract theory — it is the direct cause of the most common production incidents in Aurora clusters.
+
+This part contains three chapters, and they form a narrative arc:
+
+**Chapter 4: MVCC and the Transaction System.** We begin with Multi-Version Concurrency Control, the mechanism that lets a `SELECT` read a consistent snapshot without acquiring a single lock. Those 13 hidden bytes from Chapter 2 — `DB_TRX_ID` and `DB_ROLL_PTR` — are the physical foundation. We trace how InnoDB assigns transaction IDs, how the `ReadView` structure captures a snapshot of global transaction state, and how the `changes_visible()` algorithm decides, in at most three comparisons, whether a row version belongs in your query's result set. We follow the undo log version chains that reconstruct historical row versions, and we compare the four isolation levels that determine when snapshots are taken.
+
+**Chapter 5: The Purge System.** MVCC makes readers and writers coexist peacefully — but the cleanup mechanism becomes Aurora's Achilles' heel when readers and writers share storage. Every `UPDATE` and `DELETE` creates a historical version in the undo log. Someone must remove those versions when no transaction needs them anymore. That someone is the purge system, a background garbage collector that is simultaneously the most destructive failure mode in Aurora production and the least understood. One old read view on any reader blocks purge for the entire cluster. We examine the architecture, the cascade mechanism, the cross-instance blocking behavior unique to Aurora, and the operational playbook for monitoring and mitigation.
+
+**Chapter 6: Locking and Deadlocks.** MVCC handles consistent reads; purge handles cleanup. But when transactions modify data, they need locks. We map the lock type hierarchy — shared, exclusive, intention, gap, next-key — and trace how InnoDB's deadlock detector builds a wait-for graph and selects victims. We provide the SQL queries, `SHOW ENGINE INNODB STATUS` interpretation, CloudWatch integration, and the four common deadlock patterns that every production DBA encounters.
+
+The central tension running through these chapters is concurrency at scale. InnoDB's design elegantly isolates transactions from each other. Aurora's shared-storage architecture concentrates that isolation across up to 16 instances. A design decision that is harmless on a single MySQL server — a long-running `SELECT` on a replica — becomes a cluster-wide denial-of-service vector in Aurora. Understanding *why* requires understanding the engine. These three chapters provide that understanding.

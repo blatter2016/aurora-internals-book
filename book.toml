@@ -1,0 +1,29 @@
+[book]
+title = "Aurora MySQL Internals: A Production Engineer's Deep Guide"
+authors = ["Engineering Research Team"]
+description = "Comprehensive coverage of Aurora MySQL internals from storage architecture through query optimization, with emphasis on production debugging and cluster planning."
+language = "en"
+
+[build]
+build-dir = "book"
+create-missing = false
+
+[output.html]
+default-theme = "light"
+preferred-dark-theme = "navy"
+mathjax-support = true
+copy-fonts = true
+no-section-label = false
+
+[output.html.fold]
+enable = true
+level = 0
+
+[output.html.search]
+enable = true
+limit-results = 20
+teaser-word-count = 30
+use-boolean-and = true
+boost-hierarchy = 2
+boost-paragraph = 1
+boost-hierarchy-duplicate = 1

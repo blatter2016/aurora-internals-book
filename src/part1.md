@@ -1,0 +1,15 @@
+# Part I: The Machine
+
+Before we can understand how data changes, we must understand where it lives. Every transaction, every lock, every query execution plan, every production outage — all of them rest on the physical reality of how Aurora stores bits on disk. The storage architecture is not merely an implementation detail to be abstracted away. It is the substrate that determines your cluster's durability guarantees, its failure modes, its performance ceiling, and the exact shape of the operations runbooks you will need at 3 AM.
+
+This part opens the hood and examines the machinery in three layers.
+
+**Chapter 1: Aurora Architecture** starts with the fundamental problem that motivated Aurora's creation: the I/O amplification crisis of traditional MySQL in cloud environments. We examine the storage-compute separation, the 6-copy quorum model that provides AZ+1 durability, the log-structured storage fleet with its eight-step I/O pipeline, and the consistency points (VCL, VDL, SCL, CPL) that govern how transactions commit and recover. We compare Aurora against standard MySQL across ten dimensions — write amplification, checkpointing, crash recovery, replica architecture — and identify exactly what Aurora eliminates, what it keeps, and what it adds.
+
+**Chapter 2: InnoDB Table and Index Structure** moves up one level to examine how InnoDB organizes data within Aurora's distributed storage. We cover the 16 KB page structure, the B+ tree layout for clustered and secondary indexes, the row formats (COMPACT and DYNAMIC), and the free space management that determines when page splits occur. Every concept here is standard InnoDB — but understanding it precisely is essential because Aurora's storage layer manipulates these same pages, just through redo log application rather than direct page writes.
+
+**Chapter 3: The Buffer Pool** covers the memory layer that bridges compute and storage. We examine the LRU list, the flush list, dirty page management, checkpoint mechanics as they exist in Aurora's storage tier, and the survivable page cache that preserves the buffer pool across database restarts. We also cover the coupling between buffer pool efficiency and query performance — why a cold buffer pool after failover can be more damaging than the failover itself.
+
+This bottom-up approach matters because the boundaries between these layers are where Aurora's most dangerous failure modes live. A replica lag spike is a buffer pool problem caused by storage-level redo volume. A cluster-wide slowdown is a purge problem rooted in undo log storage that is itself driven by read view behavior on replicas. A failover latency problem is a buffer pool warming problem that is itself a consequence of the survivable cache being instance-local. To diagnose any of these, you need to trace symptoms down through all three layers — and that requires knowing what each layer looks like.
+
+By the end of Part I, you will understand exactly where your data sits — and why Aurora's storage decisions create both its greatest strengths and its most dangerous failure modes.

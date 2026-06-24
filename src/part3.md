@@ -1,0 +1,15 @@
+# Part III: The Pipeline
+
+Parts I and II built the engine. We traced the storage architecture — how Aurora distributes data across six-way segmented volumes across three availability zones. We dissected the InnoDB page, followed a row from its physical layout on disk through the B-tree to the buffer pool's LRU list. We mapped the transaction system: MVCC, undo logs, read views, the History List Length ticking upward, and the purge thread racing to clean up behind long-running queries. We covered locks — record locks, gap locks, next-key locks, and the deadlock detection graph that wakes at one-second intervals.
+
+We understand the transaction engine. Now we follow a single change from the moment it is written to the moment it appears on a replica.
+
+Part III traces the data pipeline end-to-end. Chapter 7 dissects the write path: how Aurora's redo-log-only architecture eliminates the doublewrite buffer, checkpoints, and most of the seven-step write amplification that constrains standard MySQL. We cover the async commit architecture — why worker threads never block on commit, and why a dedicated commit thread paradoxically becomes the bottleneck under high-frequency small transactions. We catalog the parameters that simply do not matter in Aurora, explain crash recovery that is up to 97% faster than traditional databases, and resolve the async commit paradox that confuses every migrating DBA.
+
+Chapter 8 follows the same write as it reaches read replicas. Aurora's replicas don't receive binlog events. They share the same storage volume and apply redo logs independently to their own buffer pools — a design that produces replica lag in milliseconds but introduces a two-layer consistency model every production DBA must internalize. We map the root causes of replica lag, the failover mechanics that make Aurora's RPO effectively zero, and the connection management patterns (including RDS Proxy and session pinning) that separate a surviving failover from a production incident.
+
+Chapter 9 examines how Aurora executes the queries that read this data. We cover the cost-based optimizer, EXPLAIN formats, access methods, join algorithms, and the Aurora-specific wait events — `io/aurora_redo_log_flush`, `io/table/sql/handler` — that dominate production incident post-mortems. We surface the critical limitation: Query Plan Management is PostgreSQL-only, leaving Aurora MySQL DBAs without the plan stability tools their PostgreSQL counterparts rely on.
+
+These chapters are where Aurora's architecture most visibly diverges from standard MySQL — and where many production surprises originate. The write path that looks familiar at first glance operates on entirely different mechanics. The replication that reports "20 ms lag" can still serve 170 ms stale data. The query that ran fine yesterday may pick a different plan today with no QPM to catch it. Understanding the pipeline is not academic detail. It is what separates a configuration that works on paper from one that survives a Tuesday afternoon traffic spike.
+
+---
